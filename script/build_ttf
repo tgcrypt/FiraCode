@@ -1,9 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash -euo pipefail
 
-source venv/bin/activate
+[ -d venv ] && source venv/bin/activate
 
 args=( "$@" )
-default_weights=( "Light" "Regular" "Retina" "Medium" "Bold" )
+default_weights=( "Light" "Regular" "Retina" "Medium" "SemiBold" "Bold" )
 weights=( "${args[@]:-"${default_weights[@]}"}" )
 
 for weight in "${weights[@]}"; do
@@ -17,8 +17,7 @@ for weight in "${weights[@]}"; do
     gftools fix-dsig --autofix ${file}
 
     echo "TTFautohint " ${file}
-    hintedFile=${file/".ttf"/"-hinted.ttf"}
-    ttfautohint -I ${file} ${hintedFile} --stem-width-mode nnn --composites
-    # --windows-compatibility
-    mv ${hintedFile} ${file}
+    ttfautohint --detailed-info ${file} ${file}.hinted --stem-width-mode nnn --composites
+    #--windows-compatibility
+    mv ${file}.hinted ${file}
 done
